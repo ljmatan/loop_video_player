@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Loop Video Player',
+      home: LoopVideoPlayer(),
+    );
+  }
+}
+
+class LoopVideoPlayer extends StatefulWidget {
+  LoopVideoPlayer({Key key}) : super(key: key);
+
+  @override
+  _LoopVideoPlayerState createState() => _LoopVideoPlayerState();
+}
+
+class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
+  VideoPlayerController _controller1 =
+      VideoPlayerController.asset('assets/videos/running.mp4');
+  VideoPlayerController _controller2 =
+      VideoPlayerController.asset('assets/videos/running2.mp4');
+  VideoPlayerController _controller3 =
+      VideoPlayerController.asset('assets/videos/running3.mp4');
+
+  VideoPlayerController _mainController;
+
+  String _imageDisplayed;
+
+  Future<void> _loopVideos() async {
+    // Set the displayed controller
+    if (_mainController != _controller1)
+      setState(() => _mainController = _controller1);
+
+    // Play the video
+    await _mainController.play();
+
+    // Set image display
+    setState(() => _imageDisplayed = 'assets/pictures/1.png');
+
+    // Display the first image for 5 seconds
+    await Future.delayed(
+      const Duration(seconds: 5),
+      // After 5 seconds, display the second image
+      () => setState(() => _imageDisplayed = 'assets/pictures/2.png'),
+    );
+    await Future.delayed(
+        const Duration(seconds: 5),
+        // Remove the second image and play the video
+        () => setState(() {
+              _imageDisplayed = null;
+              _mainController = _controller2;
+            }));
+    await _mainController.play();
+    setState(() => _mainController = _controller3);
+    await _mainController.play();
+
+    // Run the function again after the 3rd video had finished playing
+    _loopVideos();
+  }
+
+  Future<void> _startPlaying() async {
+    await _controller1.initialize();
+    await _controller2.initialize();
+    await _controller3.initialize();
+
+    setState(() => _mainController = _controller1);
+
+    _loopVideos();
+  }
+
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(
+        'http://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: FutureBuilder(
+        future: _startPlaying(),
+        builder: (context, initialised) {
+          if (initialised.hasError)
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  initialised.error.toString(),
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            );
+          else if (initialised.connectionState == ConnectionState.done) {
+            _loopVideos();
+            return _imageDisplayed != null
+                ? Image.asset(_imageDisplayed)
+                : AspectRatio(
+                    aspectRatio: _mainController.value.aspectRatio,
+                    child: VideoPlayer(_mainController),
+                  );
+          } else
+            return Center(
+              child: SizedBox(
+                height: 64,
+                width: 64,
+                child: CircularProgressIndicator(),
+              ),
+            );
+        },
+      ),
+    );
+  }
+}
