@@ -57,15 +57,15 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
   static const String _image2 = 'assets/pictures/2.png';
   static const String _image3 = 'assets/pictures/3.png';
 
-  final VideoPlayerController _controller1 =
+  static final VideoPlayerController _controller1 =
       VideoPlayerController.asset(_video1)..setLooping(true);
-  final VideoPlayerController _controller2 =
+  static final VideoPlayerController _controller2 =
       VideoPlayerController.asset(_video2)..setLooping(true);
-  final VideoPlayerController _controller3 =
+  static final VideoPlayerController _controller3 =
       VideoPlayerController.asset(_video3)..setLooping(true);
 
-  VideoPlayerController _controller;
-  VideoPlayerController get controller => _controller;
+  static VideoPlayerController _controller;
+  static VideoPlayerController get controller => _controller;
 
   Future<void> _initializeVideoPlayerFuture;
 
@@ -83,56 +83,54 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
         .whenComplete(() => _controller = _controller1);
   }
 
-  String _imageDisplayed;
+  static String _imageDisplayed;
 
-  bool _started = false;
+  static bool _started = false;
 
   Future<void> _loopVideos() async {
-    if (!_started) {
-      _started = true;
+    _started = true;
 
-      // Play the video
-      _controller.play();
+    // Play the video
+    _controller.play();
 
-      await Future.delayed(_controller1.value.duration);
-      _controller1.seekTo(const Duration());
+    await Future.delayed(_controller1.value.duration);
+    _controller1.seekTo(const Duration());
 
-      // Set image display
-      setState(() => _imageDisplayed = _image1);
+    // Set image display
+    setState(() => _imageDisplayed = _image1);
 
-      // Display the first image for 5 seconds
-      await Future.delayed(
+    // Display the first image for 5 seconds
+    await Future.delayed(
+      const Duration(seconds: 5),
+      // After 5 seconds, display the second image
+      () => setState(() => _imageDisplayed = _image2),
+    );
+
+    await Future.delayed(
         const Duration(seconds: 5),
-        // After 5 seconds, display the second image
-        () => setState(() => _imageDisplayed = _image2),
-      );
+        // Remove the second image and play the video
+        () => setState(() {
+              _controller = _controller2;
+              _imageDisplayed = null;
+            }));
 
-      await Future.delayed(
-          const Duration(seconds: 5),
-          // Remove the second image and play the video
-          () => setState(() {
-                _controller = _controller2;
-                _imageDisplayed = null;
-              }));
+    _controller.play();
+    await Future.delayed(_controller2.value.duration);
+    _controller2.seekTo(const Duration());
 
-      _controller.play();
-      await Future.delayed(_controller2.value.duration);
-      _controller2.seekTo(const Duration());
+    setState(() => _controller = _controller3);
+    _controller.play();
+    await Future.delayed(_controller3.value.duration);
+    _controller3.seekTo(const Duration());
 
-      setState(() => _controller = _controller3);
-      _controller.play();
-      await Future.delayed(_controller3.value.duration);
-      _controller3.seekTo(const Duration());
-
-      setState(() => _imageDisplayed = _image3);
-      await Future.delayed(const Duration(seconds: 5), () {
-        _started = false;
-        setState(() {
-          _controller = _controller1;
-          _imageDisplayed = null;
-        });
+    setState(() => _imageDisplayed = _image3);
+    await Future.delayed(const Duration(seconds: 5), () {
+      _started = false;
+      setState(() {
+        _controller = _controller1;
+        _imageDisplayed = null;
       });
-    }
+    });
   }
 
   @override
@@ -155,7 +153,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
         else if (snapshot.connectionState == ConnectionState.done) {
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
-          _loopVideos();
+          if (!_started) _loopVideos();
           return Center(
             child: _imageDisplayed != null
                 ? Image.asset(_imageDisplayed)
