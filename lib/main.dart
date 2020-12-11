@@ -99,7 +99,6 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
     // Set image display
     setState(() => _imageDisplayed = _image1);
-    _controller1.seekTo(const Duration());
 
     // Display the first image for 5 seconds
     await Future.delayed(
@@ -120,17 +119,17 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     await Future.delayed(_controller2.value.duration);
 
     setState(() => _controller = _controller3);
-    _controller2.seekTo(const Duration());
+
     _controller.play();
     await Future.delayed(_controller3.value.duration);
 
     setState(() => _imageDisplayed = _image3);
-    _controller3.seekTo(const Duration());
+
     await Future.delayed(
       const Duration(seconds: _imagePreviewTime),
       () {
-        _started = false;
         setState(() {
+          _started = false;
           _controller = _controller1;
           _imageDisplayed = null;
         });
@@ -156,9 +155,9 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
             ),
           );
         else if (snapshot.connectionState == ConnectionState.done) {
+          if (!_started) _loopVideos();
           // If the VideoPlayerController has finished initialization, use
           // the data it provides to limit the aspect ratio of the video.
-          if (!_started) _loopVideos();
           return Center(
             child: _imageDisplayed != null
                 ? Image.asset(_imageDisplayed)
