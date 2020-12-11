@@ -107,37 +107,40 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Material(
-        color: Colors.transparent,
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              FlatButton(
-                color: Colors.blue,
-                child: const Text(
-                  'Video 2',
-                  style: TextStyle(color: Colors.white),
+      builder: (context) => WillPopScope(
+        child: Material(
+          color: Colors.transparent,
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FlatButton(
+                  color: Colors.blue,
+                  child: const Text(
+                    'Video 2',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    _videoDisplayed = _video2;
+                    Navigator.pop(context);
+                  },
                 ),
-                onPressed: () {
-                  _videoDisplayed = _video2;
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                color: Colors.blue,
-                child: const Text(
-                  'Video 3',
-                  style: TextStyle(color: Colors.white),
+                FlatButton(
+                  color: Colors.blue,
+                  child: const Text(
+                    'Video 3',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    _videoDisplayed = _video3;
+                    Navigator.pop(context);
+                  },
                 ),
-                onPressed: () {
-                  _videoDisplayed = _video3;
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        onWillPop: () async => false,
       ),
     );
 
