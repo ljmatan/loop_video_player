@@ -33,6 +33,7 @@ class LoopVideoPlayer extends StatefulWidget {
 }
 
 class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
+  // Video files
   final VideoPlayerController _controller1 =
       VideoPlayerController.asset('assets/videos/running.mp4')
         ..setLooping(true);
@@ -75,8 +76,8 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       // Play the video
       _controller.play();
 
-      await Future.delayed(_controller1.value.duration)
-          .whenComplete(() => _controller1.seekTo(const Duration()));
+      await Future.delayed(_controller1.value.duration);
+      _controller1.seekTo(const Duration());
 
       // Set image display
       setState(() => _imageDisplayed = 'assets/pictures/1.png');
@@ -96,13 +97,13 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
               }));
 
       _controller.play();
-      await Future.delayed(_controller2.value.duration)
-          .whenComplete(() => _controller2.seekTo(const Duration()));
+      await Future.delayed(_controller2.value.duration);
+      _controller2.seekTo(const Duration());
 
       setState(() => _controller = _controller3);
       _controller.play();
-      await Future.delayed(_controller3.value.duration)
-          .whenComplete(() => _controller3.seekTo(const Duration()));
+      await Future.delayed(_controller3.value.duration);
+      _controller3.seekTo(const Duration());
 
       setState(() => _imageDisplayed = 'assets/pictures/3.png');
       await Future.delayed(const Duration(seconds: 5), () {
