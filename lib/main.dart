@@ -11,6 +11,17 @@ void main() {
     systemNavigationBarColor: Colors.black,
   ));
 
+  // Precache images
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  binding.addPostFrameCallback((_) async {
+    BuildContext context = binding.renderViewElement;
+    if (context != null) {
+      for (int i = 1; i < 4; i++) {
+        precacheImage(AssetImage('assets/pictures/$i.png'), context);
+      }
+    }
+  });
+
   runApp(MyApp());
 }
 
