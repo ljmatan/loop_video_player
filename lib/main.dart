@@ -78,9 +78,12 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     _controller3.initialize();
 
     // Initialize the controller and store the Future for later use.
-    _initializeVideoPlayerFuture = _controller1
-        .initialize()
-        .whenComplete(() => _controller = _controller1);
+    _initializeVideoPlayerFuture =
+        _controller1.initialize().whenComplete(() async {
+      _controller = _controller1;
+      // Slow down the first video to 50% playback speed
+      await _controller1.setPlaybackSpeed(0.5);
+    });
   }
 
   static String _imageDisplayed;
@@ -89,13 +92,54 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
   static bool _started = false;
 
+  static String _videoDisplayed;
+
   Future<void> _loopVideos() async {
     _started = true;
 
     // Play the video
     _controller.play();
-
+    // Wait until the video is finished
     await Future.delayed(_controller1.value.duration);
+    _controller.pause();
+
+    // Show buttons at the end of video
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              FlatButton(
+                color: Colors.blue,
+                child: const Text(
+                  'Video 2',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  _videoDisplayed = _video2;
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                color: Colors.blue,
+                child: const Text(
+                  'Video 3',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  _videoDisplayed = _video3;
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 
     // Set image display
     setState(() => _imageDisplayed = _image1);
@@ -107,31 +151,39 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       () => setState(() => _imageDisplayed = _image2),
     );
 
-    await Future.delayed(
-        const Duration(seconds: _imagePreviewTime),
-        // Remove the second image and play the video
-        () => setState(() {
-              _controller = _controller2;
-              _imageDisplayed = null;
-            }));
+    await Future.delayed(const Duration(seconds: _imagePreviewTime));
 
-    _controller.play();
-    await Future.delayed(_controller2.value.duration);
+    if (_videoDisplayed == null || _videoDisplayed == _video2) {
+      // Remove the second image and play the video
+      setState(() {
+        _controller = _controller2;
+        _imageDisplayed = null;
+      });
 
-    setState(() => _controller = _controller3);
+      _controller.play();
+      await Future.delayed(_controller2.value.duration);
+    }
 
-    _controller.play();
-    await Future.delayed(_controller3.value.duration);
+    if (_videoDisplayed == null || _videoDisplayed == _video3) {
+      setState(() {
+        if (_imageDisplayed != null) _imageDisplayed = null;
+        _controller = _controller3;
+      });
+
+      _controller.play();
+      await Future.delayed(_controller3.value.duration);
+    }
 
     setState(() => _imageDisplayed = _image3);
 
     await Future.delayed(
       const Duration(seconds: _imagePreviewTime),
-      () {
+      () async {
         setState(() {
           _started = false;
           _controller = _controller1;
           _imageDisplayed = null;
+          _videoDisplayed = null;
         });
       },
     );
@@ -146,7 +198,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
         if (snapshot.hasError)
           return Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 snapshot.error.toString(),
                 textAlign: TextAlign.center,
