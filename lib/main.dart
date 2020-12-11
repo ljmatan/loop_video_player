@@ -17,7 +17,7 @@ void main() {
     BuildContext context = binding.renderViewElement;
     if (context != null) {
       for (int i = 1; i < 4; i++) {
-        precacheImage(AssetImage('assets/pictures/$i.png'), context);
+        await precacheImage(AssetImage('assets/pictures/$i.png'), context);
       }
     }
   });
@@ -45,15 +45,21 @@ class LoopVideoPlayer extends StatefulWidget {
 
 class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
   // Video files
+  static const String _video1 = 'assets/videos/running.mp4';
+  static const String _video2 = 'assets/videos/running.mp4';
+  static const String _video3 = 'assets/videos/running.mp4';
+
+  // Image files
+  static const String _image1 = 'assets/pictures/1.png';
+  static const String _image2 = 'assets/pictures/2.png';
+  static const String _image3 = 'assets/pictures/3.png';
+
   final VideoPlayerController _controller1 =
-      VideoPlayerController.asset('assets/videos/running.mp4')
-        ..setLooping(true);
+      VideoPlayerController.asset(_video1)..setLooping(true);
   final VideoPlayerController _controller2 =
-      VideoPlayerController.asset('assets/videos/running2.mp4')
-        ..setLooping(true);
+      VideoPlayerController.asset(_video2)..setLooping(true);
   final VideoPlayerController _controller3 =
-      VideoPlayerController.asset('assets/videos/running3.mp4')
-        ..setLooping(true);
+      VideoPlayerController.asset(_video3)..setLooping(true);
 
   VideoPlayerController _controller;
   VideoPlayerController get controller => _controller;
@@ -91,14 +97,15 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       _controller1.seekTo(const Duration());
 
       // Set image display
-      setState(() => _imageDisplayed = 'assets/pictures/1.png');
+      setState(() => _imageDisplayed = _image1);
 
       // Display the first image for 5 seconds
       await Future.delayed(
         const Duration(seconds: 5),
         // After 5 seconds, display the second image
-        () => setState(() => _imageDisplayed = 'assets/pictures/2.png'),
+        () => setState(() => _imageDisplayed = _image2),
       );
+
       await Future.delayed(
           const Duration(seconds: 5),
           // Remove the second image and play the video
@@ -116,15 +123,13 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       await Future.delayed(_controller3.value.duration);
       _controller3.seekTo(const Duration());
 
-      setState(() => _imageDisplayed = 'assets/pictures/3.png');
+      setState(() => _imageDisplayed = _image3);
       await Future.delayed(const Duration(seconds: 5), () {
         _started = false;
         setState(() {
           _controller = _controller1;
           _imageDisplayed = null;
         });
-        // Run the function again after the 3rd video had finished playing
-        _loopVideos();
       });
     }
   }
@@ -136,6 +141,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       body: FutureBuilder(
         future: _initializeVideoPlayerFuture,
         builder: (context, snapshot) {
+          // If future has error display the error text
           if (snapshot.hasError)
             return Center(
               child: Padding(
