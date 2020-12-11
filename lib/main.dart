@@ -46,7 +46,6 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     // Create and store the VideoPlayerController. The VideoPlayerController
     // offers several different constructors to play videos from assets, files,
     // or the internet.
-
     _controller2.initialize();
     _controller3.initialize();
 
