@@ -85,6 +85,8 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
   static String _imageDisplayed;
 
+  static const int _imagePreviewTime = 5;
+
   static bool _started = false;
 
   Future<void> _loopVideos() async {
@@ -94,20 +96,20 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     _controller.play();
 
     await Future.delayed(_controller1.value.duration);
-    _controller1.seekTo(const Duration());
 
     // Set image display
     setState(() => _imageDisplayed = _image1);
+    _controller1.seekTo(const Duration());
 
     // Display the first image for 5 seconds
     await Future.delayed(
-      const Duration(seconds: 5),
+      const Duration(seconds: _imagePreviewTime),
       // After 5 seconds, display the second image
       () => setState(() => _imageDisplayed = _image2),
     );
 
     await Future.delayed(
-        const Duration(seconds: 5),
+        const Duration(seconds: _imagePreviewTime),
         // Remove the second image and play the video
         () => setState(() {
               _controller = _controller2;
@@ -116,21 +118,24 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
     _controller.play();
     await Future.delayed(_controller2.value.duration);
-    _controller2.seekTo(const Duration());
 
     setState(() => _controller = _controller3);
+    _controller2.seekTo(const Duration());
     _controller.play();
     await Future.delayed(_controller3.value.duration);
-    _controller3.seekTo(const Duration());
 
     setState(() => _imageDisplayed = _image3);
-    await Future.delayed(const Duration(seconds: 5), () {
-      _started = false;
-      setState(() {
-        _controller = _controller1;
-        _imageDisplayed = null;
-      });
-    });
+    _controller3.seekTo(const Duration());
+    await Future.delayed(
+      const Duration(seconds: _imagePreviewTime),
+      () {
+        _started = false;
+        setState(() {
+          _controller = _controller1;
+          _imageDisplayed = null;
+        });
+      },
+    );
   }
 
   @override
@@ -166,7 +171,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
         } else {
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );
