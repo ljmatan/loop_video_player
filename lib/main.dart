@@ -144,7 +144,9 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
   void dispose() {
     // Ensure disposing of the VideoPlayerController to free up resources.
     _controller.dispose();
-
+    _controller1.dispose();
+    _controller2.dispose();
+    _controller3.dispose();
     super.dispose();
   }
 }
