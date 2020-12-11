@@ -138,7 +138,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     return FutureBuilder(
       future: _initializeVideoPlayerFuture,
       builder: (context, snapshot) {
-        // If future has error display the error text
+        // If future throws exception display the error text
         if (snapshot.hasError)
           return Center(
             child: Padding(
@@ -157,12 +157,10 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
           return Center(
             child: _imageDisplayed != null
                 ? Image.asset(_imageDisplayed)
-                : Builder(
-                    builder: (context) => AspectRatio(
-                      aspectRatio: controller.value.aspectRatio,
-                      // Use the VideoPlayer widget to display the video.
-                      child: VideoPlayer(controller),
-                    ),
+                : AspectRatio(
+                    aspectRatio: controller.value.aspectRatio,
+                    // Use the VideoPlayer widget to display the video.
+                    child: VideoPlayer(controller),
                   ),
           );
         } else {
