@@ -24,13 +24,13 @@ class LoopVideoPlayer extends StatefulWidget {
 }
 
 class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
-  VideoPlayerController _controller1 =
+  final VideoPlayerController _controller1 =
       VideoPlayerController.asset('assets/videos/running.mp4')
         ..setLooping(true);
-  VideoPlayerController _controller2 =
+  final VideoPlayerController _controller2 =
       VideoPlayerController.asset('assets/videos/running2.mp4')
         ..setLooping(true);
-  VideoPlayerController _controller3 =
+  final VideoPlayerController _controller3 =
       VideoPlayerController.asset('assets/videos/running3.mp4')
         ..setLooping(true);
 
@@ -41,6 +41,8 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
   @override
   void initState() {
+    super.initState();
+
     // Create and store the VideoPlayerController. The VideoPlayerController
     // offers several different constructors to play videos from assets, files,
     // or the internet.
@@ -52,8 +54,6 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     _initializeVideoPlayerFuture = _controller1
         .initialize()
         .whenComplete(() => _controller = _controller1);
-
-    super.initState();
   }
 
   String _imageDisplayed;
