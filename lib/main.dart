@@ -65,7 +65,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
   static VideoPlayerController _controller;
   static VideoPlayerController get controller => _controller;
 
-  Future<void> _initializeVideoPlayerFuture;
+  static Future<void> _initializeVideoPlayerFuture;
 
   @override
   void initState() {
@@ -86,6 +86,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
   static String _imageDisplayed;
 
+  // Image preview time in seconds
   static const int _imagePreviewTime = 5;
 
   static bool _started = false;
@@ -99,9 +100,10 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     _controller.play();
     // Wait until the video is finished
     await Future.delayed(_controller1.value.duration);
+    // Pause the video
     _controller.pause();
 
-    // Show buttons at the end of the first video
+    // Show buttons for video selection
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -180,14 +182,12 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
     await Future.delayed(
       const Duration(seconds: _imagePreviewTime),
-      () async {
-        setState(() {
-          _started = false;
-          _controller = _controller1;
-          _imageDisplayed = null;
-          _videoToDisplay = null;
-        });
-      },
+      () => setState(() {
+        _started = false;
+        _controller = _controller1;
+        _imageDisplayed = null;
+        _videoToDisplay = null;
+      }),
     );
   }
 
@@ -210,22 +210,21 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
           );
         else if (snapshot.connectionState == ConnectionState.done) {
           if (!_started) _loopVideos();
-          // If the VideoPlayerController has finished initialization, use
-          // the data it provides to limit the aspect ratio of the video.
           return Center(
             child: _imageDisplayed != null
                 ? Image.asset(_imageDisplayed)
+                // If the VideoPlayerController has finished initialization, use
+                // the data it provides to limit the aspect ratio of the video.
                 : AspectRatio(
                     aspectRatio: controller.value.aspectRatio,
                     // Use the VideoPlayer widget to display the video.
                     child: VideoPlayer(controller),
                   ),
           );
-        } else {
+        } else
           // If the VideoPlayerController is still initializing, show a
           // loading spinner.
           return const Center(child: CircularProgressIndicator());
-        }
       },
     );
   }
