@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  // Go full screen
+  // SystemChrome.setEnabledSystemUIOverlays([]);
+
+  // Define your own status and / or main bar colors
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.black,
+  ));
+
   runApp(MyApp());
 }
 
@@ -111,10 +120,21 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: FutureBuilder(
         future: _initializeVideoPlayerFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError)
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  snapshot.error.toString(),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          else if (snapshot.connectionState == ConnectionState.done) {
             // If the VideoPlayerController has finished initialization, use
             // the data it provides to limit the aspect ratio of the video.
             _loopVideos();
@@ -146,6 +166,10 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     _controller1.dispose();
     _controller2.dispose();
     _controller3.dispose();
+
+    // Exit fullscreen
+    // SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
     super.dispose();
   }
 }
