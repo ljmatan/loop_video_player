@@ -15,11 +15,9 @@ void main() {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   binding.addPostFrameCallback((_) async {
     BuildContext context = binding.renderViewElement;
-    if (context != null) {
-      for (int i = 1; i < 4; i++) {
+    if (context != null)
+      for (int i = 1; i < 4; i++)
         await precacheImage(AssetImage('assets/pictures/$i.png'), context);
-      }
-    }
   });
 
   runApp(MyApp());
@@ -92,7 +90,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
   static bool _started = false;
 
-  static String _videoDisplayed;
+  static String _videoToDisplay;
 
   Future<void> _loopVideos() async {
     _started = true;
@@ -103,7 +101,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
     await Future.delayed(_controller1.value.duration);
     _controller.pause();
 
-    // Show buttons at the end of video
+    // Show buttons at the end of the first video
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -121,7 +119,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    _videoDisplayed = _video2;
+                    _videoToDisplay = _video2;
                     Navigator.pop(context);
                   },
                 ),
@@ -132,7 +130,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    _videoDisplayed = _video3;
+                    _videoToDisplay = _video3;
                     Navigator.pop(context);
                   },
                 ),
@@ -140,6 +138,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
             ),
           ),
         ),
+        // Ensures the buttons are not removed on back button press
         onWillPop: () async => false,
       ),
     );
@@ -156,7 +155,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
 
     await Future.delayed(const Duration(seconds: _imagePreviewTime));
 
-    if (_videoDisplayed == null || _videoDisplayed == _video2) {
+    if (_videoToDisplay == null || _videoToDisplay == _video2) {
       // Remove the second image and play the video
       setState(() {
         _controller = _controller2;
@@ -167,7 +166,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
       await Future.delayed(_controller2.value.duration);
     }
 
-    if (_videoDisplayed == null || _videoDisplayed == _video3) {
+    if (_videoToDisplay == null || _videoToDisplay == _video3) {
       setState(() {
         if (_imageDisplayed != null) _imageDisplayed = null;
         _controller = _controller3;
@@ -186,7 +185,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
           _started = false;
           _controller = _controller1;
           _imageDisplayed = null;
-          _videoDisplayed = null;
+          _videoToDisplay = null;
         });
       },
     );
