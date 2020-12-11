@@ -143,6 +143,7 @@ class _LoopVideoPlayerState extends State<LoopVideoPlayer> {
                 child: Text(
                   snapshot.error.toString(),
                   textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             );
